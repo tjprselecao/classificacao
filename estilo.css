@@ -714,7 +714,7 @@ footer .credito-rodape{
   margin-top:10px;
   font-size:5.5px;
   letter-spacing:0.02em;
-  color: #6B6258;
+  color:var(--white);
 }
 
 
