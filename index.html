@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Criação da tabela de resultado final - Unidades externas — TJPR</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body class="pagina-larga">
+
+<div class="sheet">
+
+  <div class="institutional-header">
+    <div class="tjpr-fallback">TJPR<small>TRIBUNAL DE JUSTIÇA<br>DO ESTADO DO PARANÁ</small></div>
+    <div class="tjpr-name">
+      <strong>Tribunal de Justiça do Estado do Paraná</strong>
+      <span class="tjpr-line">Secretaria de Gestão de Pessoas</span>
+      <!-- tabindex="0" para o nome por extenso também aparecer a quem navega
+           por teclado; aria-describedby liga a sigla ao texto por extenso
+           para leitores de tela. A sigla sozinha não diz nada a quem chega
+           de fora — e esta página é feita justamente para unidades de fora. -->
+      <span class="tjpr-line tjpr-sigla" tabindex="0" aria-describedby="tjprSiglaExtenso">SG-SGP-CDHO-DSERFTA<span class="tjpr-sigla-tip" id="tjprSiglaExtenso" role="tooltip">Divisão de Seleção de Estagiários e Residentes, Formação de Talentos e Ambientação da Coordenadoria de Desenvolvimento Humano e Organizacional da Secretaria de Gestão de Pessoas</span></span>
+    </div>
+    <span class="tjpr-version" title="Versão da ferramenta">v. 1.0</span>
+  </div>
+
+  <div class="app-header">
+    <header class="page-header">
+      <span class="page-emoji" aria-hidden="true">📋</span>
+      <div class="page-title-block">
+        <p class="eyebrow">Resultado final do processo seletivo</p>
+        <h1>Criação da tabela de resultado final - Unidades externas</h1>
+      </div>
+    </header>
+  </div>
+
+  <main>
+
+    <div class="step step-info">
+      <div class="step-head">
+        <span class="step-num">i</span>
+        <p class="step-title">Como funciona</p>
+      </div>
+      <p class="step-desc">Monta a <strong>tabela de resultado final</strong> do processo seletivo de estágio no mesmo modelo do relatório da Fábrica de Provas — para a unidade que conduz o próprio certame informar as notas <strong>sem precisar cadastrá-las na Fábrica</strong>. O documento gerado alimenta as etapas seguintes (elaboração do edital de classificação final).</p>
+      <ul class="step-list">
+        <li><strong>Passo 1</strong> — informe a unidade (digitar a sigla ou parte do nome sugere as unidades do TJPR) e o número do processo SEI.</li>
+        <li><strong>Passo 2</strong> — cadastre os candidatos linha por linha. A <strong>classificação</strong> segue a posição na tabela (arraste pela alça ⠿ para mudar) e a <strong>nota final</strong> é calculada pela média de prova e entrevista — editável, com aviso quando divergir. Botões reordenam por nota ou por ordem alfabética.</li>
+        <li><strong>Passo 3</strong> — salve o preenchimento na nuvem, identificado pelo número SEI. Salvar de novo com o mesmo SEI substitui o anterior, então dá para corrigir depois.</li>
+        <li><strong>Passo 4</strong> — baixe o <strong>PDF</strong> (cabeçalho institucional, pronto para juntar ao processo) e o <strong>CSV</strong>, aceito diretamente pela ferramenta do Ponto 20.</li>
+      </ul>
+      <p class="step-desc">Todo o preenchimento acontece no seu navegador. O que está na tela é guardado automaticamente neste computador — ao reabrir a página você escolhe entre continuar de onde parou ou começar outro processo seletivo do zero. Uma cópia em arquivo pode ser baixada e reaberta pela caixa <strong>Rascunho</strong>, no canto inferior direito.</p>
+    </div>
+
+    <!-- ===================== tela inicial =====================
+         Nada de campo em tela antes desta escolha: abrir a página puxando
+         sozinha o preenchimento anterior confundia quem ia começar outro
+         processo seletivo (uma unidade com certames de graduação e de
+         pós-graduação, por exemplo). -->
+    <div class="step" id="rfInicio">
+      <div class="step-head">
+        <span class="step-num">→</span>
+        <p class="step-title">Como deseja começar?</p>
+      </div>
+      <div class="rf-inicio-botoes">
+        <button type="button" class="download-btn rf-btn-inicio" id="rfBtnInicioNovo">Novo preenchimento</button>
+        <button type="button" class="download-btn rf-btn-inicio" id="rfBtnInicioAnterior">Continuar o anterior</button>
+      </div>
+      <p class="rf-inicio-nota" id="rfInicioNota"></p>
+    </div>
+
+    <div id="rfTrabalho" style="display:none;">
+
+    <!-- ============================ 1 ============================ -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">1</span>
+        <p class="step-title">Informações básicas</p>
+      </div>
+      <div class="rf-basicos">
+        <label class="rf-campo" style="grid-column:1 / -1;">Unidade (nome por extenso)<span class="rf-campo-obrig" id="rfUnidadeObrig">obrigatório</span>
+          <span class="rf-auto">
+            <!-- O autocomplete deste campo é o nosso (lista abaixo), não o do
+                 navegador. autocomplete="off" sozinho não basta: o Chrome o
+                 ignora em campos de texto que ele classifica como nome/
+                 endereço. Um valor NÃO PADRÃO impede essa classificação, e
+                 então nada é sugerido nem guardado. Os data-* desligam os
+                 gerenciadores de senha, que também se intrometem. -->
+            <input type="text" id="rfUnidade" placeholder="Digite a sigla SEI ou parte do nome da unidade..."
+                   autocomplete="rf-sem-autofill" autocorrect="off" autocapitalize="off" spellcheck="false"
+                   data-lpignore="true" data-form-type="other" data-1p-ignore
+                   role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="rfUnidadeLista">
+            <span class="rf-auto-lista" id="rfUnidadeLista" role="listbox"></span>
+          </span>
+          <small>Digitar sugere unidades da base do TJPR — escolher é opcional, o campo aceita qualquer texto. É o nome que sai no cabeçalho do PDF.</small>
+        </label>
+        <label class="rf-campo" style="grid-column:1;">Número SEI do processo seletivo<span class="rf-campo-obrig" id="rfSeiObrig">obrigatório</span>
+          <input type="text" id="rfSei" placeholder="0000000-00.0000.8.16.0000" inputmode="numeric" autocomplete="off">
+          <small>Identifica este preenchimento — cada processo seletivo tem o seu.</small>
+        </label>
+      </div>
+      <div class="rf-barra-tabela" style="margin-top:16px;">
+        <button type="button" class="link-btn" id="rfBtnNovo">Recomeçar do zero</button>
+        <span class="count-note">Limpa a tela para começar outro processo seletivo (o atual precisa já estar salvo ou baixado).</span>
+      </div>
+    </div>
+
+    <!-- ============================ 2 ============================ -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">2</span>
+        <p class="step-title">Tabela de candidatos</p>
+      </div>
+      <p class="step-desc">A coluna <strong>CLASS.</strong> acompanha a posição da linha; arraste pela alça <strong>⠿</strong> (ou use <strong>Alt+↑</strong> / <strong>Alt+↓</strong> com a alça em foco) para reordenar. Notas aceitam vírgula ou ponto; a <strong>FINAL</strong> vem da média de PROVA e ENTREVISTA e pode ser corrigida à mão — divergências ficam sinalizadas, nunca corrigidas em silêncio.</p>
+      <div class="notice-banner" style="margin:12px 0 16px 36px;">
+        <strong>Candidatos cotistas:</strong> basta o alcance de nota <strong>20% inferior</strong> à nota mínima estabelecida para os demais candidatos para serem considerados aprovados na etapa da prova.
+      </div>
+      <div class="rf-barra-tabela">
+        <button type="button" class="link-btn" id="rfBtnAdicionar">+ Adicionar candidato</button>
+        <button type="button" class="link-btn" id="rfBtnOrdenarNota">Reordenar por nota final</button>
+        <button type="button" class="link-btn" id="rfBtnOrdenarNome">Reordenar por ordem alfabética</button>
+        <span class="count-note" id="rfContagem"></span>
+      </div>
+      <div class="rf-tabela-wrap">
+        <div class="table-scroll" style="max-height:none;">
+          <table class="rf-tabela">
+            <thead>
+              <tr>
+                <th style="width:30px;"></th>
+                <th style="width:52px;" title="Posição na tabela — recalculada ao reordenar">CLASS.</th>
+                <th style="width:110px;">INSCRIÇÃO</th>
+                <th style="min-width:190px;">NOME</th>
+                <th style="min-width:150px;">E-MAIL</th>
+                <th style="width:76px;">PROVA</th>
+                <th style="width:76px;">ENTREVISTA</th>
+                <th style="width:76px;">FINAL</th>
+                <th style="width:150px;">RESERVA</th>
+                <th style="width:108px;">NASCIMENTO</th>
+                <th style="width:44px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="rfCorpo"></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="rfAvisosTabela"></div>
+    </div>
+
+    <!-- ============================ 3 ============================ -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">3</span>
+        <p class="step-title">Finalizar preenchimento</p>
+      </div>
+      <p class="step-desc">Conclui o trabalho: grava esta tabela na base da Divisão de Gestão (identificada pelo <strong>número SEI</strong>), <strong>bloqueia a edição</strong> e libera os documentos. Finalizar de novo com o mesmo SEI substitui o que estava gravado — é assim que se corrige um envio.</p>
+      <div class="notice-banner" id="rfTravadoAviso" style="display:none;margin:0 0 14px 36px;">
+        <strong>Preenchimento finalizado.</strong> A tabela está bloqueada para edição — os documentos abaixo correspondem exatamente ao que está na tela. Para mudar alguma coisa, use <strong>Editar preenchimento</strong>.
+      </div>
+      <div class="rf-doc-botoes">
+        <button type="button" class="download-btn rf-btn-doc" id="rfBtnFinalizar">Finalizar preenchimento</button>
+        <button type="button" class="download-btn rf-btn-doc" id="rfBtnEditar" style="display:none;">Editar preenchimento</button>
+      </div>
+      <p class="rf-nuvem-status" id="rfNuvemSalvoEm"></p>
+      <p class="rf-nuvem-status" id="rfNuvemStatus"></p>
+    </div>
+
+    <!-- ============================ 4 ============================
+         Os botões e a prévia só aparecem depois de finalizar (rfFinalizado),
+         para o documento não sair antes de a tabela estar gravada. -->
+    <div class="step">
+      <div class="step-head">
+        <span class="step-num">4</span>
+        <p class="step-title">Documentos</p>
+      </div>
+      <p class="step-desc" id="rfDocsEspera">Disponível depois de <strong>finalizar o preenchimento</strong>, no Passo 3.</p>
+      <div id="rfDocsArea" style="display:none;">
+        <div class="rf-doc-botoes">
+          <button type="button" class="download-btn rf-btn-doc" id="rfBtnPdf">Baixar PDF</button>
+          <button type="button" class="download-btn rf-btn-doc" id="rfBtnCsv">Baixar CSV</button>
+        </div>
+        <p class="rf-nuvem-status" id="rfMsgDocs"></p>
+        <p class="step-desc" style="margin-top:14px;">Prévia do documento:</p>
+        <div id="rfDocumento" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- ===================== área administrativa =====================
+         Fora da numeração dos passos e no fim da página, de propósito: são
+         ações que mexem na base compartilhada e não fazem parte do trabalho
+         de quem só precisa gerar o documento da sua unidade. -->
+    <div class="rf-admin" id="rfAdmin">
+      <div class="rf-admin-cab">
+        <p class="rf-admin-tit">Área administrativa</p>
+        <button type="button" class="link-btn" id="rfAdminToggle" aria-expanded="false" aria-controls="rfAdminCorpo">Abrir</button>
+      </div>
+      <p class="rf-admin-nota">Recuperação de registros já gravados e backup da base. Restrita à equipe gestora — salvar o próprio preenchimento é o Passo 3, acima.</p>
+
+      <div id="rfAdminCorpo" style="display:none;">
+        <div id="rfAdminTrava">
+          <div class="rf-pin-linha">
+            <label class="rf-campo" style="flex-direction:row;align-items:center;gap:10px;">PIN de acesso
+              <input type="password" id="rfPin" inputmode="numeric" maxlength="6" placeholder="······" autocomplete="off">
+            </label>
+            <button type="button" class="link-btn" id="rfBtnPin">Entrar</button>
+            <span class="count-note" id="rfPinMsg"></span>
+          </div>
+        </div>
+
+        <div id="rfAdminConteudo" style="display:none;">
+          <p class="step-desc" style="margin-left:0;">Abrir um registro <strong>substitui</strong> o que estiver na tela — salve ou baixe antes, se ainda precisar.</p>
+          <div class="rf-barra-tabela" style="margin-left:0;">
+            <input type="text" id="rfNuvemBusca" class="rf-busca" placeholder="Buscar registro salvo por SEI ou unidade..." autocomplete="off">
+            <button type="button" class="link-btn" id="rfBtnNuvemBuscar">Buscar salvos</button>
+          </div>
+          <div class="rf-nuvem-lista" style="margin-left:0;" id="rfNuvemLista"></div>
+          <p class="rf-nuvem-status" style="margin-left:0;" id="rfNuvemStatusAdmin"></p>
+
+          <div class="rf-barra-tabela" style="margin-left:0;margin-top:18px;">
+            <button type="button" class="link-btn" id="rfBtnBackupBaixar">Baixar backup completo (.json)</button>
+            <button type="button" class="link-btn" id="rfBtnBackupRestaurar">Restaurar backup</button>
+            <input type="file" id="rfBackupArquivo" accept="application/json" style="display:none;">
+            <span class="count-note">O backup traz todos os registros da base — guarde uma cópia periodicamente.</span>
+          </div>
+          <div id="rfAvisoBackup"></div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /rfTrabalho -->
+
+  </main>
+
+  <footer>
+    <p class="aviso-rodape">
+      <strong>Aviso:</strong> esta ferramenta está em fase de testes e não é um sistema oficial do Tribunal de Justiça do Estado do Paraná (TJPR).
+      O documento gerado é um apoio de trabalho — a conferência das notas e da classificação é responsabilidade da unidade.
+    </p>
+    <p class="credito-rodape">elaborado com o uso de ia por igor pankiewicz</p>
+  </footer>
+</div>
+
+<!-- começa recolhida: ação ocasional, e aberta cobriria o pé da tabela -->
+<aside class="float-draft collapsed" id="rfDraft">
+  <div class="float-draft-head">
+    <p class="float-draft-tit">Rascunho</p>
+    <button type="button" class="float-draft-toggle" id="rfDraftToggle" title="Abrir" aria-expanded="false">+</button>
+  </div>
+  <div class="float-draft-body">
+    <input type="file" id="rfRascunhoArquivo" accept="application/json" style="display:none;">
+    <button type="button" class="link-btn" id="rfBtnRascunhoBaixar">Salvar (.json)</button>
+    <button type="button" class="link-btn" id="rfBtnRascunhoAbrir">Abrir rascunho</button>
+    <p class="float-draft-nota" id="rfDraftNota">rascunho local guardado automaticamente</p>
+  </div>
+</aside>
+
+<div class="fluxo-aviso" id="rfAviso" role="status" aria-live="polite"></div>
+
+<script src="tjpr_logo.js"></script>
+<script src="edital_unidades_sei.js"></script>
+<script src="resultado_final_logic.js"></script>
+<script src="pagina.js"></script>
+</body>
+</html>

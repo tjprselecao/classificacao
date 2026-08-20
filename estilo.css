@@ -1,0 +1,816 @@
+/*
+  estilo.css — folha única desta página.
+
+  Derivada do core.css do portal interno de ferramentas do TJPR, com todas as
+  regras das outras ferramentas removidas: aqui ficou só o que esta página usa.
+
+  100% offline: nenhuma fonte, imagem ou script é carregado por URL externa.
+  As fontes citadas ('Barlow', 'Barlow Semi Condensed', 'IBM Plex Mono') são
+  usadas quando já instaladas na máquina; caso contrário cai no system-ui
+  declarado logo em seguida em cada família.
+*/
+
+:root{
+  /* Cores institucionais oficiais do TJPR (Manual de Uso da Marca) */
+  --navy: #002a3a;      /* Pantone 303 C — cor primária */
+  --navy-light: #0d4658;
+  --teal: #008c95;      /* Pantone 321 C — cor secundária */
+  --mint: #49c5b1;      /* Pantone 3258 C */
+  --gold: #eeb134;      /* Pantone 116 C */
+  --coral: #eb553b;     /* Pantone 2026 C */
+
+  --paper: #eef1f2;
+  --paper-dark: #dde4e6;
+  --ink: #14232a;
+  --ink-soft: #4d5e64;
+  --line: #c7d2d5;
+  --white: #ffffff;
+
+  /* aliases mantidos para o restante do CSS */
+  --seal: var(--navy);
+  --seal-light: var(--teal);
+  --stamp-red: var(--coral);
+}
+
+*{ box-sizing:border-box; }
+
+/* Normalização dos controles de formulário. Cada navegador aplica sua própria
+   folha de estilo em <button>/<input>/<select> — o Chrome, em particular, não
+   herda font-family nem line-height do body. Sem isto, botões e campos postos
+   lado a lado numa mesma linha saem com alturas diferentes (o alinhamento fica
+   certo no Safari/Firefox e escalonado no Chrome). */
+
+button, input, select{
+  font-family:'Barlow', system-ui, sans-serif;
+  margin:0;
+}
+
+button{ line-height:1.2; }
+
+body{
+  margin:0;
+  background:
+    radial-gradient(ellipse at top left, rgba(255,255,255,0.25), transparent 60%),
+    var(--paper);
+  color:var(--ink);
+  font-family:'Barlow', system-ui, sans-serif;
+  padding:32px 16px 80px;
+}
+
+.sheet{
+  /* cor de acento da ferramenta: filete do cabeçalho e borda do bloco "Como
+     funciona". No portal interno vinha do registro da ferramenta, via JS. */
+  --accent: var(--mint);
+  max-width:980px;
+  margin:0 auto;
+  background:var(--white);
+  border:1px solid var(--line);
+  box-shadow:0 1px 0 var(--line), 0 18px 40px -24px rgba(35,40,31,0.45);
+  position:relative;
+}
+
+.sheet::before{
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:6px;
+  background:linear-gradient(90deg, var(--navy) 0%, var(--navy) 20%, var(--teal) 20%, var(--teal) 40%, var(--mint) 40%, var(--mint) 60%, var(--gold) 60%, var(--gold) 80%, var(--coral) 80%, var(--coral) 100%);
+}
+
+.institutional-header{
+  padding:22px 40px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  border-bottom:1px solid var(--line);
+  background:var(--white);
+}
+
+.institutional-header .tjpr-fallback{
+  display:block;
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:700;
+  font-size:22px;
+  color:var(--navy);
+  letter-spacing:0.02em;
+  line-height:1;
+  flex-shrink:0;
+}
+
+.institutional-header .tjpr-fallback small{
+  display:block;
+  font-family:'Barlow', system-ui, sans-serif;
+  font-weight:500;
+  font-size:9px;
+  letter-spacing:0.08em;
+  color:var(--ink-soft);
+  margin-top:2px;
+}
+
+.institutional-header .tjpr-name{
+  font-family:'Barlow', system-ui, sans-serif;
+  font-size:12px;
+  color:var(--ink-soft);
+  line-height:1.4;
+  border-left:1px solid var(--line);
+  padding-left:18px;
+}
+
+.institutional-header .tjpr-name strong{
+  display:block;
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:600;
+  font-size:14px;
+  color:var(--navy);
+  letter-spacing:0.01em;
+}
+
+/* cada linha da identificação (secretaria, seção) numa linha própria,
+   mantendo a formatação do bloco tjpr-name */
+
+.institutional-header .tjpr-name .tjpr-line{ display:block; }
+
+/* Sigla da unidade: passar o mouse (ou dar foco pelo teclado) mostra o nome
+   por extenso AO LADO. O balão é posicionado em absolute justamente para
+   surgir sem empurrar nada — o cabeçalho não pode "pular" ao passar o mouse. */
+
+.institutional-header .tjpr-sigla{
+  position:relative;
+  width:max-content;
+  cursor:help;
+  border-bottom:1px dotted var(--line);
+}
+
+.institutional-header .tjpr-sigla:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+
+.institutional-header .tjpr-sigla-tip{
+  position:absolute;
+  left:100%; top:50%;
+  transform:translateY(-50%);
+  margin-left:14px;
+  width:max-content; max-width:430px;
+  padding:9px 13px;
+  background:var(--navy);
+  color:var(--white);
+  font-family:'Barlow', system-ui, sans-serif;
+  font-size:11.5px;
+  font-weight:400;
+  line-height:1.45;
+  border-radius:7px;
+  box-shadow:0 6px 20px rgba(0,42,58,0.22);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .13s ease;
+  z-index:40;
+  /* selecionável de propósito: o nome por extenso serve para ser copiado e
+     colado num documento. Como o balão é FILHO da sigla, o mouse dentro dele
+     mantém o :hover do pai — o balão não some enquanto se arrasta a seleção. */
+  cursor:text;
+  user-select:text;
+  -webkit-user-select:text;
+}
+
+/* ponte invisível sobre o vão entre a sigla e o balão: sem ela, o ponteiro
+   perderia o hover no meio do caminho e o balão sumiria antes de ser alcançado */
+
+.institutional-header .tjpr-sigla-tip::before{
+  content:"";
+  position:absolute;
+  right:100%; top:0; bottom:0;
+  width:16px;
+}
+
+.institutional-header .tjpr-sigla:hover .tjpr-sigla-tip, .institutional-header .tjpr-sigla:focus-within .tjpr-sigla-tip, .institutional-header .tjpr-sigla:focus-visible .tjpr-sigla-tip{ opacity:1; visibility:visible; }
+
+/* telas estreitas: ao lado não cabe, então o balão desce para baixo da sigla */
+
+@media (max-width:900px){
+  .institutional-header .tjpr-sigla-tip{
+      left:0; top:100%;
+      transform:none;
+      margin:6px 0 0;
+      max-width:min(430px, 78vw);
+    }
+  .institutional-header .tjpr-sigla-tip::before{
+      right:auto; left:0;
+      top:auto; bottom:100%;
+      width:100%; height:8px;
+    }
+}
+
+.institutional-header .tjpr-version{
+  margin-left:auto;
+  padding-left:18px;
+  font-family:'Barlow', system-ui, sans-serif;
+  font-size:12px;
+  font-weight:500;
+  color:var(--ink-soft);
+  flex-shrink:0;
+}
+
+.app-header{
+  background:var(--navy);
+  /* filete de acento na base do cabeçalho; a cor vem do --accent declarado
+     em .sheet */
+  border-bottom:4px solid var(--accent, var(--mint));
+}
+
+header{
+  padding:28px 40px 24px;
+}
+
+/* cabeçalho de página com selo de emoji — versão para o fundo azul-marinho */
+
+.page-header{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:28px 40px 24px;
+}
+
+.page-emoji{
+  flex-shrink:0;
+  width:56px; height:56px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px;
+  line-height:1;
+  background:#fffdf7;
+  border:1px solid rgba(255,255,255,0.28);
+  box-shadow:3px 3px 0 var(--accent, var(--mint));
+}
+
+.page-title-block{ min-width:0; }
+
+/* Bloco informativo ("i" — como usar) no topo das ferramentas: mesma família
+   visual do notice-banner, com borda esquerda na cor de acento da página. */
+
+.step-info{
+  background:#f8fbfc;
+  border:1px solid var(--line);
+  border-left:4px solid var(--accent, var(--teal));
+  padding:18px 20px 8px;
+}
+
+.app-header .eyebrow{ color:var(--mint); }
+
+.app-header h1{ color:var(--white); }
+
+.eyebrow{
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:11px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--seal);
+  margin:0 0 6px;
+}
+
+h1{
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-size:30px;
+  font-weight:700;
+  margin:0;
+  line-height:1.15;
+}
+
+main{ padding:32px 40px 40px; }
+
+.step{ margin-bottom:34px; }
+
+.step-head{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+/* Cabeçalho do bloco "Como funciona" (.step-info): o colapsar/expandir é
+   ligado pelo pagina.js, então só o visual mora aqui. A margem negativa
+   compensa o padding que a própria regra acrescenta — não depende do padding
+   do .step-info pai. */
+
+.step-info .step-head{
+  cursor:pointer;
+  user-select:none;
+  padding:6px 10px;
+  margin:-6px -10px 4px;
+  border-radius:7px;
+  transition:background .12s;
+}
+
+.step-info .step-head:hover{
+  background:rgba(0,42,58,0.06); /* cor simples de reserva, para navegadores sem color-mix() */
+  background:color-mix(in srgb, var(--accent, var(--teal)) 12%, transparent);
+}
+
+.step-info .step-head:hover .step-title{ color:var(--navy); }
+
+.step-info .step-head:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+
+.step-info-seta{ margin-left:auto; color:var(--ink-soft); font-size:12px; transition:transform .15s,color .12s; }
+
+.step-info .step-head:hover .step-info-seta{ color:var(--navy); }
+
+.step-info .step-head[aria-expanded="true"] .step-info-seta{ transform:rotate(180deg); }
+
+.step-num{
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:700;
+  font-size:15px;
+  color:var(--white);
+  background:var(--seal);
+  width:26px; height:26px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+
+.step-title{
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-size:18px;
+  font-weight:600;
+  margin:0;
+}
+
+.step-desc{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  margin:0 0 12px 36px;
+  line-height:1.5;
+}
+
+/* listas de instrução dentro dos blocos de passo — mesmo tamanho/entrelinha do texto padrão */
+
+.step-list{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  line-height:1.5;
+  margin:0 0 12px 36px;
+  padding-left:18px;
+}
+
+.step-list li{ margin-bottom:4px; }
+
+textarea{
+  width:100%;
+  min-height:160px;
+  padding:14px;
+  border:1px solid var(--line);
+  background:#fffdf7;
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:12.5px;
+  line-height:1.5;
+  color:var(--ink);
+  resize:vertical;
+}
+
+textarea:focus, input:focus, button:focus, select:focus{
+  outline:2px solid var(--seal-light);
+  outline-offset:2px;
+}
+
+input[type=file]{ display:none; }
+
+.link-btn{
+  font-family:'Barlow', system-ui, sans-serif;
+  font-weight:600;
+  font-size:12.5px;
+  letter-spacing:0.01em;
+  color:var(--teal);
+  background:none;
+  border:1px solid var(--teal);
+  padding:7px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+.link-btn:hover{ background:var(--teal); color:var(--white); }
+
+/* Aviso/status inline dentro de um passo.
+   Uso: class="notice-banner" (neutro/andamento) | "notice-banner ok" (sucesso)
+   | "notice-banner warn" (atenção/erro). */
+
+.notice-banner{
+  margin:14px 0 0 36px;
+  padding:12px 16px;
+  border-left:4px solid var(--teal);
+  background:#f3fafa;
+  font-size:13px;
+  color:var(--ink-soft);
+  line-height:1.55;
+}
+
+.notice-banner strong{ color:var(--ink); }
+
+.notice-banner.ok{ border-left-color:var(--mint); background:#f2faf8; }
+
+.notice-banner.warn{ border-left-color:var(--coral); background:#fdf3f1; }
+
+@media (max-width:600px){
+  .notice-banner{ margin-left:0; }
+}
+
+.warn-list{
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:12px;
+  color:var(--stamp-red);
+  margin:6px 0 0;
+  padding-left:18px;
+}
+
+.warn-list li{ margin-bottom:3px; }
+
+.table-scroll{
+  overflow-x:auto;
+  border:1px solid var(--line);
+  max-height:480px;
+  overflow-y:auto;
+}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:11.5px;
+  white-space:nowrap;
+}
+
+thead th{
+  position:sticky; top:0;
+  background:var(--ink);
+  color:var(--white);
+  text-align:left;
+  padding:9px 10px;
+  font-weight:500;
+  letter-spacing:0.02em;
+  border-right:1px solid rgba(255,255,255,0.12);
+}
+
+tbody td{
+  padding:7px 10px;
+  border-bottom:1px solid var(--paper-dark);
+  border-right:1px solid var(--paper-dark);
+}
+
+tbody tr:nth-child(even){ background:#fbfaf4; }
+
+.download-btn{
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:700;
+  font-size:15px;
+  padding:13px 26px;
+  background:var(--stamp-red);
+  color:var(--white);
+  border:none;
+  cursor:pointer;
+}
+
+.download-btn:hover{ background:#722525; }
+
+.download-btn:disabled{ background:#a7a290; cursor:not-allowed; }
+
+.count-note{
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:12px;
+  color:var(--ink-soft);
+}
+
+.empty-hint{
+  font-size:13px;
+  color:var(--ink-soft);
+  font-style:italic;
+  padding:18px 0;
+}
+
+/* Header fixo miniaturizado: aparece quando o cabeçalho principal sai de
+   vista ao rolar. Traz só o nome da ferramenta e o botão "Topo" — não há
+   menu, porque esta página é a ferramenta inteira. Montado pelo pagina.js. */
+
+.mini-header{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:60;
+  background:var(--navy);
+  transform:translateY(-100%);
+  transition:transform .25s ease;
+  box-shadow:0 8px 20px -10px rgba(0,42,58,0.55);
+}
+
+.mini-header.show{ transform:translateY(0); }
+
+.mini-header-inner{
+  max-width:980px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 16px;
+}
+
+.mini-header-tit{
+  flex:1;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:600;
+  font-size:13.5px;
+  letter-spacing:0.03em;
+  color:rgba(255,255,255,0.82);
+  padding:12px 0;
+}
+
+.top-btn{
+  flex-shrink:0;
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:600;
+  font-size:12.5px;
+  letter-spacing:0.03em;
+  color:var(--white);
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.28);
+  padding:7px 14px;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background .15s ease;
+}
+
+.top-btn:hover{ background:rgba(255,255,255,0.2); }
+
+.top-btn:focus-visible{ outline:2px solid var(--mint); outline-offset:2px; }
+
+footer{
+  text-align:center;
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:11px;
+  color:var(--ink-soft);
+  padding:20px;
+  letter-spacing:0.04em;
+}
+
+/* ============================================================
+   Caixa flutuante de rascunho — fixa no canto inferior direito,
+   sempre ao alcance enquanto o usuário rola a página (Ponto 18).
+   Recolhe para uma aba estreita quando atrapalha a leitura.
+   ============================================================ */
+
+.float-draft{
+  position:fixed;
+  right:18px; bottom:18px;
+  z-index:60;
+  width:232px;
+  background:var(--white);
+  border:1px solid var(--line);
+  border-top:3px solid var(--teal);
+  box-shadow:0 12px 30px -14px rgba(35,40,31,0.55);
+  font-family:'Barlow', system-ui, sans-serif;
+}
+
+.float-draft-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px; padding:9px 12px;
+  border-bottom:1px solid var(--paper-dark);
+  background:#fbfdfd;
+}
+
+.float-draft-tit{
+  margin:0;
+  font-family:'Barlow Semi Condensed', system-ui, sans-serif;
+  font-weight:700; font-size:12.5px; letter-spacing:0.05em;
+  text-transform:uppercase; color:var(--ink-soft);
+}
+
+.float-draft-toggle{
+  border:none; background:none; cursor:pointer;
+  font-size:15px; line-height:1; padding:2px 6px; color:var(--ink-soft);
+}
+
+.float-draft-toggle:hover{ color:var(--teal); }
+
+.float-draft-body{ padding:10px 12px 12px; }
+
+.float-draft-body .link-btn{ display:block; width:100%; margin-bottom:6px; text-align:center; }
+
+.float-draft-nota{
+  margin:6px 0 0;
+  font-family:'IBM Plex Mono', 'Consolas', monospace;
+  font-size:10.5px; line-height:1.45; color:var(--ink-soft);
+}
+
+.float-draft.collapsed{ width:auto; }
+
+.float-draft.collapsed .float-draft-body{ display:none; }
+
+.float-draft.collapsed .float-draft-head{ border-bottom:none; }
+
+@media print{
+  .float-draft{ display:none; }
+}
+
+/* ============================================================
+   Grade remanejável por arrastar e soltar
+   ============================================================ */
+
+.drag-handle{
+  cursor:grab;
+  border:1px solid transparent;
+  background:none;
+  color:var(--line);
+  font-size:15px; line-height:1;
+  padding:4px 5px;
+  border-radius:2px;
+}
+
+.drag-handle:hover{ color:var(--teal); border-color:var(--line); background:#f4fafa; }
+
+.drag-handle:focus-visible{ outline:2px solid var(--teal); outline-offset:1px; }
+
+.drag-handle:active{ cursor:grabbing; }
+
+/* Botão de excluir a linha, na última coluna da grade editável. */
+
+.row-del-btn{
+  border:1px solid transparent;
+  background:none;
+  color:var(--ink-soft);
+  font-size:13px; line-height:1;
+  padding:4px 7px;
+  cursor:pointer;
+  border-radius:2px;
+}
+
+.row-del-btn:hover{ color:var(--white); background:var(--stamp-red); border-color:var(--stamp-red); }
+
+@media (max-width:600px){
+  .float-draft{ right:10px; bottom:10px; width:190px; }
+}
+
+@media (max-width:600px){
+  header{ padding:26px 20px 18px; }
+  .page-header{ padding:24px 20px 18px; gap:14px; }
+  .page-emoji{ width:46px; height:46px; font-size:23px; }
+  main{ padding:24px 20px 32px; }
+  h1{ font-size:24px; }
+  .step-desc{ margin-left:0; }
+}
+
+/* Página de folha larga. A tabela de candidatos tem onze colunas: presa aos
+   980px da folha padrão, o nome e o e-mail ficavam espremidos. Aqui a folha
+   acompanha a janela e só a prosa continua na medida de leitura confortável
+   — texto corrido em 1600px não se lê. */
+
+body.pagina-larga .sheet{ max-width:none; }
+
+body.pagina-larga .mini-header-inner{ max-width:none; }
+
+body.pagina-larga main > .step-info, body.pagina-larga main > .step-desc{ max-width:980px; }
+
+/* Aviso flutuante de gravação. Fica fixo porque o salvamento é automático e
+   acontece enquanto a pessoa está rolando a tabela — um aviso no topo da
+   página passaria despercebido justamente quando falhasse. Vai à ESQUERDA
+   porque a direita é da caixa de cópia de segurança. */
+
+.fluxo-aviso{
+  position:fixed; left:18px; bottom:18px; z-index:70;
+  max-width:340px; padding:11px 15px;
+  background:var(--navy); color:var(--white);
+  border-left:4px solid var(--mint);
+  box-shadow:0 12px 30px -14px rgba(0,42,58,0.75);
+  font-family:'Barlow', system-ui, sans-serif;
+  font-size:12.5px; line-height:1.45;
+  opacity:0; transform:translateY(8px);
+  pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+}
+
+.fluxo-aviso.aparece{ opacity:1; transform:translateY(0); }
+
+@media print{
+  .fluxo-aviso{ display:none !important; }
+}
+
+@media (max-width:600px){
+  .fluxo-aviso{ left:10px; right:10px; top:10px; bottom:auto; max-width:none; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition:none !important; }
+}
+
+/* ============================================================
+   Rodapé
+   ============================================================ */
+
+footer .aviso-rodape{
+  max-width:640px;
+  margin:0 auto 14px;
+  font-family:'Barlow', system-ui, sans-serif;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--ink-soft);
+}
+footer .aviso-rodape strong{ color:var(--coral); }
+
+/* Crédito discreto: tamanho reduzido e cor próxima à do fundo. */
+footer .credito-rodape{
+  margin-top:10px;
+  font-size:5.5px;
+  letter-spacing:0.02em;
+  color:var(--paper-dark);
+}
+
+
+/* ============================================================
+   Tabela de candidatos e demais elementos próprios desta página
+   (prefixo rf-). Vinham em um <style> dentro do HTML enquanto a
+   ferramenta convivia com as outras no portal interno; agora que
+   a página é a ferramenta inteira, ficam aqui com o resto.
+   ============================================================ */
+
+.rf-basicos{ display:grid; grid-template-columns:minmax(260px,340px) 1fr; gap:14px 18px; margin:0 0 6px 36px; }
+.rf-campo{ display:flex; flex-direction:column; gap:5px; font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; color:var(--ink); font-weight:600; }
+.rf-campo input{ padding:9px 12px; border:1px solid var(--line); border-radius:7px; font-family:'Barlow',system-ui,sans-serif; font-size:13.5px; color:var(--ink); background:var(--white); font-weight:400; }
+.rf-campo input:focus{ outline:2px solid var(--teal); outline-offset:1px; }
+.rf-campo small{ font-weight:400; color:var(--ink-soft); }
+.rf-campo-obrig{ color:var(--coral); font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-left:6px; }
+@media (max-width:720px){ .rf-basicos{ grid-template-columns:1fr; margin-left:0; } }
+
+/* autocomplete da unidade: lista sobreposta ao fluxo da página, por isso o
+   campo fica em position:relative e a lista em absolute. display:block nos
+   itens é obrigatório — são <span> dentro de <label>, e como inline eles
+   emendariam um no outro numa parede de texto ilegível. */
+.rf-auto{ position:relative; display:block; }
+.rf-auto input{ width:100%; box-sizing:border-box; }
+.rf-auto-lista{ position:absolute; z-index:30; top:100%; left:0; right:0; margin-top:2px;
+  background:var(--white); border:1px solid var(--line); border-radius:7px; box-shadow:0 6px 18px rgba(0,42,58,.13);
+  max-height:300px; overflow-y:auto; display:none; }
+.rf-auto-lista.aberta{ display:block; }
+.rf-auto-item{ display:block; padding:9px 12px; cursor:pointer; font-family:'Barlow',system-ui,sans-serif;
+  font-size:12.5px; font-weight:400; color:var(--ink); line-height:1.4; border-bottom:1px solid var(--paper); }
+.rf-auto-item:last-child{ border-bottom:none; }
+.rf-auto-item:hover, .rf-auto-item.ativo{ background:#eef3f6; }
+.rf-auto-sigla{ display:block; font-family:'Barlow Semi Condensed',system-ui,sans-serif; font-weight:700;
+  font-size:12px; color:var(--navy); letter-spacing:.02em; }
+.rf-auto-nome{ display:block; }
+
+/* tela inicial: as duas escolhas antes de qualquer campo */
+.rf-inicio-botoes{ display:flex; gap:14px; flex-wrap:wrap; margin:4px 0 0 36px; }
+.rf-inicio-botoes .rf-btn-inicio{ min-width:240px; text-align:center; justify-content:center; }
+.rf-inicio-nota{ font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; color:var(--ink-soft);
+  margin:12px 0 0 36px; line-height:1.5; }
+
+/* botões de documento com a mesma largura, lado a lado */
+.rf-doc-botoes{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-left:36px; }
+.rf-doc-botoes .rf-btn-doc{ min-width:190px; text-align:center; justify-content:center; }
+
+/* área administrativa: separada do fluxo do usuário final, discreta */
+.rf-admin{ margin:46px 0 0; padding:18px 20px; border:1px dashed var(--line); border-radius:8px; background:#fafcfc; }
+.rf-admin-cab{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.rf-admin-tit{ font-family:'Barlow Semi Condensed',system-ui,sans-serif; font-weight:700; font-size:14px; color:var(--ink-soft); margin:0; }
+.rf-admin-nota{ font-family:'Barlow',system-ui,sans-serif; font-size:11.5px; color:var(--ink-soft); margin:6px 0 0; }
+.rf-pin-linha{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+.rf-pin-linha input{ width:120px; padding:9px 12px; border:1px solid var(--line); border-radius:7px;
+  font-family:'IBM Plex Mono',Consolas,monospace; font-size:14px; letter-spacing:.28em; text-align:center; }
+.rf-busca{ flex:1 1 280px; min-width:200px; padding:9px 12px; border:1px solid var(--line); border-radius:7px;
+  font-family:'Barlow',system-ui,sans-serif; font-size:13px; }
+
+/* tabela de candidatos: white-space:normal anula o nowrap global de tabelas;
+   sem table-layout fixo porque as colunas são inputs de largura controlada e
+   o nome precisa poder crescer */
+.rf-tabela-wrap{ margin-left:36px; }
+.rf-tabela{ width:100%; border-collapse:collapse; white-space:normal; font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; }
+.rf-tabela th, .rf-tabela td{ border:1px solid var(--line); padding:5px 6px; vertical-align:middle; }
+.rf-tabela th{ background:var(--paper); font-weight:700; color:var(--ink-soft); font-size:10.5px; text-transform:uppercase; letter-spacing:.02em; text-align:center; white-space:nowrap; }
+.rf-tabela input, .rf-tabela select{ width:100%; padding:5px 6px; border:1px solid var(--line); border-radius:4px; font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; color:var(--ink); background:var(--white); }
+.rf-tabela input:focus, .rf-tabela select:focus{ outline:2px solid var(--teal); outline-offset:0; }
+.rf-col-class{ width:52px; text-align:center; color:var(--ink-soft); font-weight:700; }
+.rf-nota-divergente{ background:#fdf3f1; border-color:var(--coral); }
+
+/* Arrastar e soltar na tabela: a linha em trânsito esmaece e a linha de
+   destino ganha um filete no lado por onde a solta vai entrar. */
+.rf-tabela tbody tr.row-dragging{ opacity:0.4; }
+.rf-tabela tbody tr.drop-before td{ box-shadow:inset 0 3px 0 var(--teal); }
+.rf-tabela tbody tr.drop-after td{ box-shadow:inset 0 -3px 0 var(--teal); }
+
+/* campos em somente-leitura depois de finalizar: sem cara de caixa de
+   digitação, mas com o texto ainda selecionável para poder ser copiado */
+.rf-tabela input.rf-in-travado{ background:var(--paper); border-color:transparent; color:var(--ink); cursor:default; }
+.rf-tabela input.rf-in-travado:focus{ outline:1px solid var(--line); }
+.rf-reserva-travada{ font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; color:var(--ink); padding:0 4px; }
+.rf-barra-tabela button:disabled{ opacity:.45; cursor:not-allowed; }
+.rf-btn-excluir{ color:var(--coral); border-color:var(--coral); }
+.rf-btn-excluir:hover{ background:var(--coral); color:var(--white); }
+.rf-barra-tabela{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:12px 0 12px 36px; }
+
+.rf-nuvem-status{ font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; color:var(--ink-soft); margin:8px 0 0 36px; }
+.rf-nuvem-lista{ margin:12px 0 0 36px; display:flex; flex-direction:column; gap:6px; max-height:280px; overflow-y:auto; }
+.rf-nuvem-item{ display:flex; gap:12px; align-items:center; padding:8px 12px; border:1px solid var(--line); border-radius:7px; background:var(--white); font-family:'Barlow',system-ui,sans-serif; font-size:12.5px; }
+.rf-nuvem-item .rf-nuvem-info{ flex:1; min-width:0; }
+.rf-nuvem-item .rf-nuvem-unidade{ font-weight:600; color:var(--ink); overflow-wrap:break-word; }
+.rf-nuvem-item .rf-nuvem-meta{ color:var(--ink-soft); font-size:11.5px; }
+
+#rfDocumento{ border:1px solid var(--line); background:var(--white); padding:28px 34px; margin:14px 0 0 36px; overflow-x:auto; }
+
+/* Telas estreitas: o recuo de 36px sob o cabeçalho numerado do passo não cabe. */
+@media (max-width:900px){
+  .rf-inicio-botoes, .rf-inicio-nota, .rf-doc-botoes, .rf-tabela-wrap,
+  .rf-barra-tabela, .rf-nuvem-status, .rf-nuvem-lista, #rfDocumento{ margin-left:0; }
+}
